@@ -1,0 +1,30 @@
+package io.github.raphaelmun1z.LEA01.controller;
+
+import io.github.raphaelmun1z.LEA01.entities.Processo;
+import io.github.raphaelmun1z.LEA01.dto.ResultadoSimulacaoResponseDTO;
+import io.github.raphaelmun1z.LEA01.service.EscalonadorService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/escalonamento")
+public class EscalonadorController {
+    private final EscalonadorService escalonadorService;
+
+    public EscalonadorController(EscalonadorService escalonadorService) {
+        this.escalonadorService = escalonadorService;
+    }
+
+    @PostMapping("/prioridade-com-preempcao")
+    public ResponseEntity<ResultadoSimulacaoResponseDTO> simularEscalonamentoPrioComPreempcao(@RequestBody List<Processo> processos) {
+        ResultadoSimulacaoResponseDTO resultado = escalonadorService.simular(processos);
+        return ResponseEntity.ok(resultado);
+    }
+
+    @PostMapping("/srtf")
+    public ResponseEntity<Void> simularEscalonamentoSRTF(@RequestBody List<Processo> processos) {
+        return ResponseEntity.ok().build();
+    }
+}
