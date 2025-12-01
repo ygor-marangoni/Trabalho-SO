@@ -37,7 +37,6 @@ function addProcess() {
 
   processes.push(newProcess);
 
-
   burstInput.value = Math.floor(Math.random() * 8) + 1;
   priorityInput.value = Math.floor(Math.random() * 5);
 
@@ -132,16 +131,25 @@ async function simular() {
   resultsContainer.classList.remove('hidden');
   statusBanner.textContent = 'Processando simulação no servidor...';
 
+  // Selecionar Endpoint
   const algorithm = document.getElementById('algorithmSelect').value;
   // URL base do Spring Boot 
   const baseUrl = 'http://localhost:8080/api/escalonamento';
 
   let endpoint = '';
+
   if (algorithm === 'PRIORITY_PREEMPTIVE') {
     endpoint = `${baseUrl}/prioridade-com-preempcao`;
+  } else if (algorithm === 'SRTF') {
+    endpoint = `${baseUrl}/srtf`;
+  } else if (algorithm === 'RR_PRIORITY_AGING') {
+    endpoint = `${baseUrl}/rr-prioridade-envelhecimento`;
   } else {
+    console.warn('Algoritmo desconhecido, usando SRTF');
     endpoint = `${baseUrl}/srtf`;
   }
+
+  //  Mapear dados para o formato do backend
   const payload = processes.map((p) => ({
     nomeProcesso: p.id,
     tempoChegada: p.arrival,
@@ -150,6 +158,7 @@ async function simular() {
   }));
 
   try {
+    // Fazer a requisição
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {

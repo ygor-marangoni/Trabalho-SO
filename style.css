@@ -42,10 +42,10 @@ body {
   font-family: var(--font-main);
   background-color: var(--slate-50);
   color: var(--slate-800);
-  height: 100vh; 
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden; 
+  overflow: hidden;
 }
 
 .hidden {
@@ -80,7 +80,7 @@ body {
   background: var(--white);
   border-bottom: 1px solid var(--slate-200);
   height: 64px;
-  flex: none; 
+  flex: none;
   z-index: 20;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
@@ -106,7 +106,6 @@ body {
   color: var(--white);
   padding: 0.5rem;
   border-radius: 0.5rem;
-  box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.3);
   font-size: 1.25rem;
 }
 
@@ -143,7 +142,7 @@ body {
 
 .btn-link span {
   display: inline;
-} 
+}
 
 .btn-link:hover {
   color: var(--primary-600);
@@ -172,7 +171,7 @@ body {
 }
 
 .sidebar {
-  width: 450px; 
+  width: 450px;
   background: var(--white);
   border-right: 1px solid var(--slate-200);
   display: flex;
@@ -455,13 +454,13 @@ select {
 
 .results-area {
   flex: 1;
-  background: #f8fafc80; 
+  background: #f8fafc80;
   padding: 1.5rem;
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  overflow-y: auto; 
+  overflow-y: auto;
 }
 
 .welcome-message {
@@ -537,7 +536,6 @@ select {
   gap: 1rem;
 }
 
-
 @media (min-width: 768px) {
   .metrics-grid {
     grid-template-columns: 1fr 1fr;
@@ -577,7 +575,7 @@ select {
   align-items: center;
   justify-content: center;
   font-size: 1rem;
-  flex-shrink: 0; 
+  flex-shrink: 0;
 }
 .metric-icon.blue {
   background: var(--blue-50);
@@ -637,7 +635,7 @@ select {
   border-collapse: collapse;
   font-size: 0.875rem;
   text-align: left;
-  min-width: 600px; 
+  min-width: 600px;
 }
 .results-table th {
   padding: 0.75rem 1.5rem;
@@ -672,7 +670,7 @@ select {
   width: 90%;
   margin: 1rem;
   overflow: hidden;
-  max-height: 90vh; 
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
 }
@@ -716,7 +714,7 @@ select {
 
 @media (max-width: 768px) {
   body {
-    height: auto; 
+    height: auto;
     overflow: auto;
   }
 
@@ -748,12 +746,12 @@ select {
 
   @media (max-width: 400px) {
     .form-row {
-      grid-template-columns: 1fr; 
+      grid-template-columns: 1fr;
     }
   }
 
   .process-list-container {
-    max-height: 250px; 
+    max-height: 250px;
     border-bottom: 1px solid var(--slate-200);
   }
 
@@ -769,11 +767,11 @@ select {
   }
 
   .title-box p {
-    display: none; 
+    display: none;
   }
 
   .btn-link span {
-    display: none; 
+    display: none;
   }
 
   .welcome-message {

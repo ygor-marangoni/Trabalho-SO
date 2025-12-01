@@ -11,6 +11,7 @@
 </head>
 
 <body>
+
   <header class="app-header">
     <div class="header-content">
       <div class="header-left">
@@ -24,7 +25,7 @@
       </div>
       <div class="header-right">
         <a href="#" class="btn-link" onclick="alert('Funcionalidade de exportação em breve!')">
-          <i class="fa-solid fa-download"></i> Exportar
+          <i class="fa-solid fa-download"></i> <span>Exportar</span>
         </a>
         <button onclick="toggleInfoModal()" class="btn-icon">
           <i class="fa-solid fa-circle-question"></i>
@@ -45,6 +46,7 @@
             <select id="algorithmSelect">
               <option value="PRIORITY_PREEMPTIVE">Prioridade (Preemptivo)</option>
               <option value="SRTF">SRTF (Shortest Remaining Time First)</option>
+              <option value="RR_PRIORITY_AGING">Round Robin + Prioridade + Envelhecimento</option>
             </select>
             <i class="fa-solid fa-chevron-down select-icon"></i>
           </div>
@@ -109,15 +111,15 @@
           <i class="fa-solid fa-chart-simple"></i>
         </div>
         <h3>Pronto para Simular</h3>
-        <p>Adicione processos e clique em "Simular" para enviar os dados ao backend e visualizar o Gráfico de Gantt.</p>
+        <p>Adicione processos e clique em "Simular" para enviar os dados ao backend Spring Boot.</p>
       </div>
 
       <div id="resultsContainer" class="results-container hidden">
-
         <div class="status-banner">
           <i class="fa-solid fa-server"></i>
-          <span>Aguardando resposta do servidor (verifique o Console do navegador para ver o JSON gerado)...</span>
+          <span>Aguardando resposta do servidor...</span>
         </div>
+
 
         <div class="metrics-grid">
           <div class="card metric-card">
@@ -149,7 +151,6 @@
 
           <div class="card-body">
             <div id="ganttChart" class="gantt-placeholder">
-              <p>O gráfico será renderizado aqui após o processamento do backend.</p>
             </div>
           </div>
         </div>
@@ -171,9 +172,6 @@
                 </tr>
               </thead>
               <tbody id="resultsTableBody">
-                <tr>
-                  <td colspan="6" class="text-center text-muted">Aguardando simulação...</td>
-                </tr>
               </tbody>
             </table>
           </div>
@@ -189,13 +187,18 @@
         <h3>Sobre os Algoritmos</h3>
         <div class="modal-text">
           <p>
-            <strong>Prioridade (Preemptivo):</strong> O processo com a maior prioridade (menor número) assume a CPU. Se chegar um processo com prioridade maior do que o atual, ocorre preempção.
+            <strong>Prioridade (Preemptivo):</strong> O processo com a maior prioridade (menor número) assume a CPU. Preempção ocorre se chegar alguém mais prioritário.
           </p>
           <p>
-            <strong>SRTF (Shortest Remaining Time First):</strong> Versão preemptiva do SJF. Escolhe o processo que tem o menor tempo de execução restante.
+            <strong>SRTF:</strong> Escolhe o processo com o menor tempo restante de execução.
+          </p>
+          <p>
+            <strong>RR + Prioridade + Envelhecimento:</strong>
+            Algoritmo híbrido. Executa baseado em prioridade, mas com fatia de tempo (Quantum = 2).
+            Aplica envelhecimento (Alpha = 1) para evitar inanição.
           </p>
           <div class="alert-box">
-            <i class="fa-solid fa-triangle-exclamation"></i> Convenção: Valor menor de prioridade = Maior importância (Ex: 0 > 1).
+            <i class="fa-solid fa-triangle-exclamation"></i> Menor número = Maior Prioridade.
           </div>
         </div>
       </div>
