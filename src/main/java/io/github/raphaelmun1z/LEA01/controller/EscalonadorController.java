@@ -28,4 +28,10 @@ public class EscalonadorController {
         ResultadoSimulacaoResponseDTO resultado = escalonadorService.simularSRTF(processos);
         return ResponseEntity.ok(resultado);
     }
+
+    @PostMapping("/rr-prioridade-envelhecimento")
+    public ResponseEntity<ResultadoSimulacaoResponseDTO> simularEscalonamentoRRComPrioridade(@RequestBody List<Processo> processos) {
+        ResultadoSimulacaoResponseDTO resultado = escalonadorService.simularRoundRobinPrioridadeEnvelhecimento(processos);
+        return ResponseEntity.ok(resultado);
+    }
 }

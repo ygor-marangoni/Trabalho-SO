@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  api-escalonador:
+    build: .
+    image: raphaelmuniz/escalonador-api:1.0.0
+    container_name: escalonador-api
+    ports:
+      - "8080:8080"
+    environment:
+      - JAVA_OPTS=-Xmx512m
+    networks:
+      - escalonador-network
+    restart: unless-stopped
+
+networks:
+  escalonador-network:
+    driver: bridge

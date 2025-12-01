@@ -16,17 +16,30 @@ public class EscalonadorService {
         Comparator<Processo> estrategia = Comparator.comparingInt(Processo::getPrioridade)
             .thenComparingInt(Processo::getTempoChegada);
 
-        return executarSimulacao(entradaProcessos, estrategia);
+        return executarSimulacao(entradaProcessos, estrategia, false, 0, 0);
     }
 
     public ResultadoSimulacaoResponseDTO simularSRTF(List<Processo> entradaProcessos) {
         Comparator<Processo> estrategia = Comparator.comparingInt(Processo::getTempoRestante)
             .thenComparingInt(Processo::getTempoChegada);
 
-        return executarSimulacao(entradaProcessos, estrategia);
+        return executarSimulacao(entradaProcessos, estrategia, false, 0, 0);
     }
 
-    private ResultadoSimulacaoResponseDTO executarSimulacao(List<Processo> entradaProcessos, Comparator<Processo> criterioOrdenacao) {
+    public ResultadoSimulacaoResponseDTO simularRoundRobinPrioridadeEnvelhecimento(List<Processo> entradaProcessos) {
+        Comparator<Processo> estrategia = Comparator.comparingInt(Processo::getPrioridade)
+            .thenComparingInt(Processo::getTempoChegada);
+
+        return executarSimulacao(entradaProcessos, estrategia, true, 2, 1);
+    }
+
+    private ResultadoSimulacaoResponseDTO executarSimulacao(
+        List<Processo> entradaProcessos,
+        Comparator<Processo> criterioOrdenacao,
+        boolean usarRoundRobin,
+        int quantum,
+        int fatorEnvelhecimento
+    ) {
         // Criei uma nova lista com os processos apenas para facilitar as manipulações
         List<Processo> processos = new ArrayList<>();
         for (Processo p : entradaProcessos) {
@@ -39,6 +52,10 @@ public class EscalonadorService {
         int tempoAtual = 0;
         int processosConcluidos = 0;
         int totalProcessos = processos.size();
+
+        // Trecho para auxiliar o algoritmo round robin
+        Processo ultimoProcessoExecutado = null;
+        int quantumAtual = 0;
 
         // Essa repetição simula o clock do processador
         while (processosConcluidos < totalProcessos) {
@@ -53,24 +70,65 @@ public class EscalonadorService {
             if (filaProntos.isEmpty()) {
                 historicoExecucao.add("Ocioso");
                 tempoAtual++;
+                ultimoProcessoExecutado = null;
                 continue;
+            }
+
+            // Aplica envelhecimento
+            if (fatorEnvelhecimento > 0 && filaProntos.size() > 1) {
+                for (Processo p : filaProntos) {
+                    if (p != ultimoProcessoExecutado) {
+                        int novaPrioridade = Math.max(0, p.getPrioridade() - fatorEnvelhecimento);
+                        p.setPrioridade(novaPrioridade);
+                    }
+                }
             }
 
             // Aqui defini a ordem da execução
             filaProntos.sort(criterioOrdenacao);
 
             // Pega o primeiro processo
-            Processo atual = filaProntos.getFirst();
+            Processo escolhido = filaProntos.get(0);
+
+            if (usarRoundRobin) {
+                // Se o último processo ainda está pronto e não estourou o quantum,
+                // confirmo se ainda tem a melhor prioridade para continuar.
+                boolean deveTrocar = true;
+
+                if (ultimoProcessoExecutado != null && !ultimoProcessoExecutado.estaFinalizado()) {
+                    if (quantumAtual < quantum) {
+                        if (ultimoProcessoExecutado.getPrioridade() <= escolhido.getPrioridade()) {
+                            escolhido = ultimoProcessoExecutado;
+                            deveTrocar = false;
+                        }
+                    }
+                }
+
+                if (deveTrocar && escolhido != ultimoProcessoExecutado) {
+                    quantumAtual = 0;
+                }
+            }
 
             // Remove uma unidade de tempo do tempo restante do processo
-            atual.executar();
+            escolhido.executar();
             // Adiciona esse processo na lista que mostra a ordem de execução
-            historicoExecucao.add(atual.getNomeProcesso());
+            historicoExecucao.add(escolhido.getNomeProcesso());
+
+            // Atualiza lógica do quantum para a próxima iteração
+            if (escolhido == ultimoProcessoExecutado) {
+                quantumAtual++;
+            } else {
+                quantumAtual = 1;
+                ultimoProcessoExecutado = escolhido;
+            }
+
             tempoAtual++;
 
-            if (atual.estaFinalizado()) {
+            if (escolhido.estaFinalizado()) {
                 processosConcluidos++;
-                atual.calcularMetricas(tempoAtual);
+                escolhido.calcularMetricas(tempoAtual);
+                ultimoProcessoExecutado = null;
+                quantumAtual = 0;
             }
         }
 
