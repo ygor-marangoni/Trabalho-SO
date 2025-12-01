@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador de Escalonamento de Processos</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <header class="app-header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo-box">
+          <i class="fa-solid fa-microchip"></i>
+        </div>
+        <div class="title-box">
+          <h1>Simulador de Escalonamento</h1>
+          <p>Sistemas Operacionais</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <a href="#" class="btn-link" onclick="alert('Funcionalidade de exportação em breve!')">
+          <i class="fa-solid fa-download"></i> Exportar
+        </a>
+        <button onclick="toggleInfoModal()" class="btn-icon">
+          <i class="fa-solid fa-circle-question"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fa-solid fa-sliders"></i> Configuração</h2>
+
+        <div class="form-group">
+          <label>Algoritmo</label>
+          <div class="select-wrapper">
+            <select id="algorithmSelect">
+              <option value="PRIORITY_PREEMPTIVE">Prioridade (Preemptivo)</option>
+              <option value="SRTF">SRTF (Shortest Remaining Time First)</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-icon"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="process-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Chegada</label>
+            <input type="number" id="inputArrival" min="0" value="0">
+          </div>
+          <div class="form-group">
+            <label>Duração (Burst)</label>
+            <input type="number" id="inputBurst" min="1" value="5">
+          </div>
+          <div class="form-group">
+            <label>Prioridade</label>
+            <input type="number" id="inputPriority" min="0" value="1" title="Menor valor = Maior prioridade">
+          </div>
+        </div>
+        <button onclick="addProcess()" class="btn-dashed">
+          <i class="fa-solid fa-plus"></i> Adicionar Processo
+        </button>
+      </div>
+
+      <div class="process-list-container custom-scroll">
+        <table class="process-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th class="text-center">Chegada</th>
+              <th class="text-center">Burst</th>
+              <th class="text-center">Prio</th>
+              <th class="text-right">Ação</th>
+            </tr>
+          </thead>
+          <tbody id="processTableBody">
+          </tbody>
+        </table>
+        <div id="emptyState" class="empty-state">
+          <i class="fa-solid fa-layer-group"></i>
+          <p>Nenhum processo cadastrado.</p>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="footer-actions">
+          <button onclick="loadExample()" class="btn-secondary">Exemplo</button>
+          <button onclick="clearAll()" class="btn-danger-light">Limpar</button>
+        </div>
+        <button onclick="simular()" class="btn-primary">
+          <i class="fa-solid fa-play"></i> Simular
+        </button>
+      </div>
+    </aside>
+
+    <section class="results-area custom-scroll">
+
+      <div id="welcomeMessage" class="welcome-message">
+        <div class="icon-circle">
+          <i class="fa-solid fa-chart-simple"></i>
+        </div>
+        <h3>Pronto para Simular</h3>
+        <p>Adicione processos e clique em "Simular" para enviar os dados ao backend e visualizar o Gráfico de Gantt.</p>
+      </div>
+
+      <div id="resultsContainer" class="results-container hidden">
+
+        <div class="status-banner">
+          <i class="fa-solid fa-server"></i>
+          <span>Aguardando resposta do servidor (verifique o Console do navegador para ver o JSON gerado)...</span>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="card metric-card">
+            <div>
+              <p class="metric-label">Tempo Médio de Espera</p>
+              <h3 class="metric-value" id="avgWaitTime">-</h3>
+              <span class="metric-unit">unidades de tempo</span>
+            </div>
+            <div class="metric-icon blue">
+              <i class="fa-regular fa-clock"></i>
+            </div>
+          </div>
+          <div class="card metric-card">
+            <div>
+              <p class="metric-label">Tempo Médio de Turnaround</p>
+              <h3 class="metric-value" id="avgTurnaroundTime">-</h3>
+              <span class="metric-unit">vida do processo</span>
+            </div>
+            <div class="metric-icon emerald">
+              <i class="fa-solid fa-rotate"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-chart-gantt highlight-icon"></i> Timeline de Execução (Gantt)</h3>
+          </div>
+
+          <div class="card-body">
+            <div id="ganttChart" class="gantt-placeholder">
+              <p>O gráfico será renderizado aqui após o processamento do backend.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>Detalhes por Processo</h3>
+          </div>
+          <div class="table-responsive">
+            <table class="results-table">
+              <thead>
+                <tr>
+                  <th>Processo</th>
+                  <th class="text-center">Chegada</th>
+                  <th class="text-center">Burst</th>
+                  <th class="text-center">Espera (W)</th>
+                  <th class="text-center">Turnaround (TA)</th>
+                  <th class="text-center">Conclusão</th>
+                </tr>
+              </thead>
+              <tbody id="resultsTableBody">
+                <tr>
+                  <td colspan="6" class="text-center text-muted">Aguardando simulação...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <div id="infoModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-body">
+        <h3>Sobre os Algoritmos</h3>
+        <div class="modal-text">
+          <p>
+            <strong>Prioridade (Preemptivo):</strong> O processo com a maior prioridade (menor número) assume a CPU. Se chegar um processo com prioridade maior do que o atual, ocorre preempção.
+          </p>
+          <p>
+            <strong>SRTF (Shortest Remaining Time First):</strong> Versão preemptiva do SJF. Escolhe o processo que tem o menor tempo de execução restante.
+          </p>
+          <div class="alert-box">
+            <i class="fa-solid fa-triangle-exclamation"></i> Convenção: Valor menor de prioridade = Maior importância (Ex: 0 > 1).
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button onclick="toggleInfoModal()" class="btn-secondary">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
