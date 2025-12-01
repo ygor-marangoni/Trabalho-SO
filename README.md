@@ -1,32 +1,9 @@
-services:
-  api-escalonador:
-    image: raphaelmuniz/escalonador-api:1.0.0
-    build:
-      context: ./LEA01
-      dockerfile: Dockerfile
-    container_name: escalonador-api
-    ports:
-      - "8080:8080"
-    environment:
-      - JAVA_OPTS=-Xmx512m
-    networks:
-      - escalonador-network
-    restart: unless-stopped
+Como rodar o projeto
 
-  web-interface:
-    image: raphaelmuniz/escalonador-web:1.0.0
-    build:
-      context: ./frontend            
-      dockerfile: frontend.Dockerfile 
-    container_name: escalonador-web
-    ports:
-      - "8081:80"
-    depends_on:
-      - api-escalonador
-    networks:
-      - escalonador-network
-    restart: unless-stopped
+1. Certifique-se de ter o Docker instalado.
 
-networks:
-  escalonador-network:
-    driver: bridge
+2. Execute o comando: docker run -d -p 8080:8080 raphaelmuniz/escalonador-api:1.0.0
+
+3. Em seguida: docker run -d -p 8081:80 raphaelmuniz/escalonador-web:1.0.0
+
+4. Acesse http://localhost:8081
