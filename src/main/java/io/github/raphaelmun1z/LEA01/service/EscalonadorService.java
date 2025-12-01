@@ -11,7 +11,22 @@ import java.util.stream.Collectors;
 
 @Service
 public class EscalonadorService {
-    public ResultadoSimulacaoResponseDTO simular(List<Processo> entradaProcessos) {
+
+    public ResultadoSimulacaoResponseDTO simularPrioridade(List<Processo> entradaProcessos) {
+        Comparator<Processo> estrategia = Comparator.comparingInt(Processo::getPrioridade)
+            .thenComparingInt(Processo::getTempoChegada);
+
+        return executarSimulacao(entradaProcessos, estrategia);
+    }
+
+    public ResultadoSimulacaoResponseDTO simularSRTF(List<Processo> entradaProcessos) {
+        Comparator<Processo> estrategia = Comparator.comparingInt(Processo::getTempoRestante)
+            .thenComparingInt(Processo::getTempoChegada);
+
+        return executarSimulacao(entradaProcessos, estrategia);
+    }
+
+    private ResultadoSimulacaoResponseDTO executarSimulacao(List<Processo> entradaProcessos, Comparator<Processo> criterioOrdenacao) {
         // Criei uma nova lista com os processos apenas para facilitar as manipulações
         List<Processo> processos = new ArrayList<>();
         for (Processo p : entradaProcessos) {
@@ -41,9 +56,8 @@ public class EscalonadorService {
                 continue;
             }
 
-            // Aqui defini a ordem da execução, foi aplicado preempção
-            filaProntos.sort(Comparator.comparingInt(Processo::getPrioridade)
-                .thenComparingInt(Processo::getTempoChegada));
+            // Aqui defini a ordem da execução
+            filaProntos.sort(criterioOrdenacao);
 
             // Pega o primeiro processo
             Processo atual = filaProntos.getFirst();

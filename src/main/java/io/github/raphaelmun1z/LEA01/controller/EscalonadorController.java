@@ -19,12 +19,13 @@ public class EscalonadorController {
 
     @PostMapping("/prioridade-com-preempcao")
     public ResponseEntity<ResultadoSimulacaoResponseDTO> simularEscalonamentoPrioComPreempcao(@RequestBody List<Processo> processos) {
-        ResultadoSimulacaoResponseDTO resultado = escalonadorService.simular(processos);
+        ResultadoSimulacaoResponseDTO resultado = escalonadorService.simularPrioridade(processos);
         return ResponseEntity.ok(resultado);
     }
 
     @PostMapping("/srtf")
-    public ResponseEntity<Void> simularEscalonamentoSRTF(@RequestBody List<Processo> processos) {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ResultadoSimulacaoResponseDTO> simularEscalonamentoSRTF(@RequestBody List<Processo> processos) {
+        ResultadoSimulacaoResponseDTO resultado = escalonadorService.simularSRTF(processos);
+        return ResponseEntity.ok(resultado);
     }
 }
